@@ -1,1 +1,1 @@
-web: telefonista -port=$PORT
+web: telefonista

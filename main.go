@@ -62,7 +62,12 @@ func main() {
 		w.Write(nil)
 	})
 
-	http.ListenAndServe(":8080", nil)
+	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		port = "3000"
+	}
+
+	http.ListenAndServe(":"+port, nil)
 }
 
 type Configuration struct {
