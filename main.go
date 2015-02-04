@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"github.com/mitchellh/goamz/aws"
 	"github.com/mitchellh/goamz/s3"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -69,9 +69,7 @@ func main() {
 		defer resp.Body.Close()
 
 		log.Print("Downloading...")
-		filebytes := make([]byte, resp.ContentLength)
-		buffer := bufio.NewReader(resp.Body)
-		_, err = buffer.Read(filebytes)
+		audio, err := ioutil.ReadAll(resp.Body)
 		check(err)
 
 		log.Print("Connecting to AWS S3...")
@@ -80,7 +78,7 @@ func main() {
 
 		path := "voicemail/" + time.Now().Format("20060102150405") + ".wav"
 		log.Print("Writing " + path + " to " + config.S3BucketName + "...")
-		err = bucket.Put(path, filebytes, "audio/wav", s3.ACL("public-read"))
+		err = bucket.Put(path, audio, "audio/wav", s3.ACL("public-read"))
 		check(err)
 
 		log.Print("Posting message to Slack, channel " + config.SlackChannel + "...")
